@@ -510,17 +510,23 @@ def render_compact_table(rows):
         return
 
     headers = list(rows[0].keys())
-    header_html = "".join(f"<th>{html.escape(str(header))}</th>" for header in headers)
+    header_html = "".join(
+        f"<th style='text-align:center; vertical-align:middle;'>{html.escape(str(header))}</th>"
+        for header in headers
+    )
     body_html = ""
     for row in rows:
         body_html += "<tr>"
-        body_html += "".join(f"<td>{html.escape(str(row[header]))}</td>" for header in headers)
+        body_html += "".join(
+            f"<td style='text-align:center; vertical-align:middle;'>{html.escape(str(row[header]))}</td>"
+            for header in headers
+        )
         body_html += "</tr>"
 
     st.markdown(
         f"""
         <div style="display:inline-block; margin:6px 0 10px 0;">
-            <table style="border-collapse:collapse; table-layout:auto; width:auto; font-size:15px;">
+            <table class="compact-calc-table" style="border-collapse:collapse; table-layout:auto; width:auto; font-size:15px;">
                 <thead>
                     <tr>{header_html}</tr>
                 </thead>
@@ -530,18 +536,20 @@ def render_compact_table(rows):
             </table>
         </div>
         <style>
-            table th {{
+            .compact-calc-table th {{
                 background:#F1F5F9;
                 border:1px solid #CBD5E1;
                 padding:8px 14px;
-                text-align:center;
+                text-align:center !important;
                 white-space:nowrap;
+                vertical-align:middle !important;
             }}
-            table td {{
+            .compact-calc-table td {{
                 border:1px solid #CBD5E1;
                 padding:8px 14px;
-                text-align:center;
+                text-align:center !important;
                 white-space:nowrap;
+                vertical-align:middle !important;
             }}
         </style>
         """,
@@ -567,7 +575,7 @@ def render_calculation_process(monopile, fluid, fatigue, loc, details, total_dam
                 "H (m)": f"{sea_state['H']:.2f}",
                 "T (s)": f"{sea_state['T']:.2f}",
                 "omega (rad/s)": f"{omega:.3f}",
-                "k (1/m)": f"{k:.4f}",
+                "k": f"{k:.4f}",
             }
         )
         fatigue_rows.append(
@@ -587,12 +595,12 @@ def render_calculation_process(monopile, fluid, fatigue, loc, details, total_dam
         )
 
     with st.expander("1. 파랑하중 계산", expanded=False):
-        wave_table = "| Sea State | H (m) | T (s) | omega (rad/s) | k (1/m) |\n"
+        wave_table = "| Sea State | H (m) | T (s) | omega (rad/s) | k |\n"
         wave_table += "|---|---:|---:|---:|---:|\n"
         for row in wave_rows:
             wave_table += (
                 f"| {row['Sea State']} | {row['H (m)']} | {row['T (s)']} | "
-                f"{row['omega (rad/s)']} | {row['k (1/m)']} |\n"
+                f"{row['omega (rad/s)']} | {row['k']} |\n"
             )
         st.markdown(
             f"""
@@ -683,7 +691,7 @@ def render_calculation_process_readable(monopile, fluid, fatigue, loc, details, 
                 "H (m)": round(sea_state["H"], 3),
                 "T (s)": round(sea_state["T"], 3),
                 "omega = 2pi/T (rad/s)": round(omega, 4),
-                "k (1/m)": round(k, 5),
+                "k": round(k, 5),
             }
         )
         fatigue_rows.append(
